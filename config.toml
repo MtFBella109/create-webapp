@@ -1,0 +1,7 @@
+title = "create-webapps"
+
+[general]
+first_launch = true
+generate_desktop_file = true
+systemwide_desktop_entry = false
+locale = "en"
