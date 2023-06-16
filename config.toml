@@ -4,4 +4,5 @@ title = "create-webapps"
 first_launch = true
 generate_desktop_file = true
 systemwide_desktop_entry = false
+webapps_directory = '~/WebApps'
 locale = "en"
