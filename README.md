@@ -7,3 +7,5 @@ The Scripts works only on Linux, maybe it can work on unix, bsd or MacOs. If you
 If you want to run the Script systemwide create a symlink in /usr/bin 
 
 It is very basic at the Moment, but I will improve it in the Future. You can contribute to the Code or can create a new locale for your Language
+
+Note: The Next Update takes a bit longer, because I integrate a other way to create the WebApps, because I myself have the Problem, that the WebApps created with nativefier, didn't work on my System. But the Integration of a other way, takes a bit longer
