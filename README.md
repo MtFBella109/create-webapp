@@ -11,3 +11,5 @@ It is very basic at the Moment, but I will improve it in the Future. You can con
 ### Note for upcoming version
 The next Version will take a bit, my Plan is to move on to a other Programming Language and that needs Time.
 I need to learn the new programming Language and then rewrite the Code, but the first thing will take longer I guess
+
+I guess the new Version will come out in 2-4 Weeks
