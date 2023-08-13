@@ -6,7 +6,7 @@ Right now it's considered as a Alpha, I rewrote the complete Code in a other Pro
 The Program is right now very basic, you can create a WebApp and it can create for you a .desktop entry for this WebApp thats it for the Moment.
 Right now, it only works under Linux, in the future there will be support for *BSD, MacOS and maybe Windows
 
-##Instalation
+## Instalation
 1. Download the .rar under releases
 2. Extract everything in a Place where you like
 3. install nodejs
