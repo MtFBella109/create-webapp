@@ -14,11 +14,17 @@ Right now, it only works under Linux, in the future there will be support for *B
 5. Go into the directory, where the files are in your Terminal
 6. Run `./create-webapp` in your Terminal
 
+## Build from Source
+1.install golang 
+  Under Debian/Ubuntu etc: `sudo apt install golang`
+2. do `git clone https://github.com/MtFBella109/create-webapp/`
+3. change into the Directory
+4. Execute `go run .` in the Directory of the Project
+5. You have now a executable with the Name create-webapp
 
 
+## Reimplemention of already existed Features
+1. I have to reimplement the config writer, in the meantime you can edit it per Hand
+2. I have to reimplement the locales. For the most People it shouldn't be a Problem, because everything is in English
 
-### Note for upcoming version
-The next Version will take a bit, my Plan is to move on to a other Programming Language and that needs Time.
-I need to learn the new programming Language and then rewrite the Code, but the first thing will take longer I guess
 
-First Release of the new Version should be this week
