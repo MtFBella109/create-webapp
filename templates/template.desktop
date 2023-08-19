@@ -1,7 +1,8 @@
 [Desktop Entry]
 Encoding=UTF-8
 Version=1.0
-Type=Internet
+Type=Application
+Categories=Network;WebBrowser;
 Terminal=false
 Exec=$PATH/$NAME
 Name=$NAME
