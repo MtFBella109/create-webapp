@@ -24,7 +24,6 @@ Right now, it only works under Linux, in the future there will be support for *B
 
 
 ## Reimplemention of already existed Features
-1. I have to reimplement the config writer, in the meantime you can edit it per Hand
-2. I have to reimplement the locales. For the most People it shouldn't be a Problem, because everything is in English
+1. I have to reimplement the locales. For the most People it shouldn't be a Problem, because everything is in English
 
 
