@@ -16,16 +16,15 @@ The development break is till next year, idk which month exactly next Year
 1. Download the .rar under releases
 2. Extract everything in a Place where you like
 3. install nodejs
-4. install nativefier with `npm -g install nativefier`
-5. Go into the directory, where the files are in your Terminal
-6. Run `./create-webapp` in your Terminal
+4. Go into the directory, where the files are in your Terminal
+5. Run `./create-webapp` in your Terminal
 
 ## Build from Source
 1.install golang 
   Under Debian/Ubuntu etc: `sudo apt install golang`
 2. do `git clone https://github.com/MtFBella109/create-webapp/`
 3. change into the Directory
-4. Execute `go run .` in the Directory of the Project
+4. Execute `go build .` in the Directory of the Project
 5. You have now a executable with the Name create-webapp
 
 
