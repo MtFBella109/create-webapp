@@ -1,5 +1,7 @@
 package main
 
+//go:generate gotext -srclang=en update -out=catalog/catalog.go -lang=en,de
+
 import (
   "fmt"
   "io"
@@ -8,101 +10,84 @@ import (
   "path/filepath"
   "strings"
   "syscall"
+  "golang.org/x/text/language"
+  "golang.org/x/text/message"
 )
 
 
-func createWebApp(config *configstruct, webappName, webappURL string) {
+func createWebApp(config *configstruct, webappName, webappURL string, P *message.Printer) {
   cwd, _ := syscall.Getwd()
-  syscall.Chdir(config.webapps_directory)
-  defer syscall.Chdir(cwd)
+  err := syscall.Chdir(config.webapps_directory)
+  errCheck(err)
 
   if !strings.HasPrefix(webappURL, "https://") && !strings.HasPrefix(webappURL, "http://") {
     webappURL = "https://" + webappURL
   }
 
-  err := os.Mkdir(webappName, 0755)
-  if err != nil {
-    fmt.Println(err)
-    return
-  }
+  err = os.Mkdir(webappName, 0755)
+  errCheck(err)
 
   exec.Command("cp", filepath.Join(cwd, "templates", "WebAppTemplate", "index.js"), filepath.Join(config.webapps_directory, webappName)).Run()
   exec.Command("cp", filepath.Join(cwd, "templates", "WebAppTemplate", "package.json"), filepath.Join(config.webapps_directory, webappName)).Run()
   err = os.Chdir(filepath.Join(config.webapps_directory, webappName))
-  if err != nil {
-    fmt.Println(err)
-    return
-  }
+  errCheck(err)
 
   indexfile, err := os.Open("index.js")
-  if err != nil {
-    fmt.Println(err)
-    return
-  }
+  errCheck(err)
   defer indexfile.Close()
 
   indexfiledata, err := io.ReadAll(indexfile)
-  if err != nil {
-    fmt.Println(err)
-    return
-  }
+  errCheck(err)
 
   indexfiledata = []byte(strings.ReplaceAll(string(indexfiledata), "WBTITLE", webappName))
   indexfiledata = []byte(strings.ReplaceAll(string(indexfiledata), "WBURL", webappURL))
 
   err = os.WriteFile("index.js", indexfiledata, 0755)
+  errCheck(err)
+
+  err = exec.Command("npm", "install").Run()
   if err != nil {
-    fmt.Println(err)
-    return
+    panic(err)
   }
 
-  exec.Command("npm", "install").Run()
-
   if config.generate_desktop_file && config.specialos == "none" {
-    exec.Command("cp", filepath.Join(cwd, "templates", "template.desktop"), filepath.Join(config.webapps_directory, webappName+".desktop")).Run()
+    err =exec.Command("cp", filepath.Join(cwd, "templates", "template.desktop"), filepath.Join(config.webapps_directory, webappName+".desktop")).Run()
+    errCheck(err)
     desktopFile := webappName + ".desktop"
     file, err := os.Open(desktopFile)
-    if err != nil {
-      fmt.Println(err)
-      return
-    }
+    errCheck(err)
     defer file.Close()
 
     filedata, err := io.ReadAll(file)
-    if err != nil {
-      fmt.Println(err)
-      return
-    }
+    errCheck(err)
 
     filedata = []byte(strings.ReplaceAll(string(filedata), "$NAME", webappName))
     filedata = []byte(strings.ReplaceAll(string(filedata), "$PATH", filepath.Join(config.webapps_directory, webappName)))
 
     err = os.WriteFile(webappName+".desktop", filedata, 0644)
-    if err != nil {
-      fmt.Println(err)
-      return
-    }
+    errCheck(err)
 
     if config.systemwide_desktop_entry {
       err = exec.Command("sudo", "mv", filepath.Join(config.webapps_directory, webappName+".desktop"), "/usr/share/applications/").Run()
-      if err != nil {
-        fmt.Println(err)
-        return
-      }
+      errCheck(err)
     } else {
       err = exec.Command("mv", filepath.Join(config.webapps_directory, webappName+".desktop"), filepath.Join("~/.local/share/applications/")).Run()
-      if err != nil {
-        fmt.Println(err)
-        return
-      }
+      errCheck(err)
     }
 
-    fmt.Println("WebApp was successfully created")
+    P.Println("WebApp was successfully created")
   } else if config.generate_desktop_file && config.specialos == "nixos" {
-    fmt.Println("Function to add NixOS support is not yet implemented")
+    P.Println("Function to add NixOS support is not yet implemented")
   }
+  defer syscall.Chdir(cwd)
 }
 
+func errCheck(err error) {
+  if err != nil {
+    fmt.Println(err)
+    return
+  }
+}
 
 func main() {
   config := Config()
@@ -110,10 +95,12 @@ func main() {
   var webappName string
   var webappURL string
 
-  fmt.Println("What's the Name of the WebApp?")
+  P := message.NewPrinter(language.German)
+
+  P.Println("What's the Name of the WebApp?")
   fmt.Scanln(&webappName)
-  fmt.Println("What's the URL of the WebApp?")
+  P.Println("What's the URL of the WebApp?")
   fmt.Scanln(&webappURL)
 
-  createWebApp(config, webappName, webappURL)
+  createWebApp(config, webappName, webappURL, P)
 }

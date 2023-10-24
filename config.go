@@ -1,9 +1,13 @@
 package main
+//go:generate gotext -srclang=en update -out=catalog/catalog.go -lang=en,de
 
 import (
 	"fmt"
+	"os/user"
 	"strings"
-
+  "os"
+  "golang.org/x/text/language"
+  "golang.org/x/text/message"
 	"github.com/spf13/viper"
 )
 
@@ -38,48 +42,57 @@ func Config() *configstruct {
 }
 
 func writeConfig(config *configstruct, configfile *viper.Viper) {
-  fmt.Println("1: Generate Desktop File (Default is true)")
-  fmt.Println("2: Make the Desktop entry systemwide available (Default is false)")
-  fmt.Println("3: In which Directory should all WebApps go in? ATTENTION: This Directory has to exist, otherwise the Program will not work correctly (Default is ~/WebApps)")
-  fmt.Println("4: Change the locale (Default is en)")
-  fmt.Println("5: Change SpecialOS, you can only choose between NixOS and none")
+  p := message.NewPrinter(language.German)
+  p.Println("1: Generate Desktop File (Default is true)")
+  p.Println("2: Make the Desktop entry systemwide available (Default is false)")
+  p.Println("3: In which Directory should all WebApps go in? ATTENTION: This Directory has to exist, otherwise the Program will not work correctly (Default is ~/WebApps)")
+  p.Println("4: Change the locale (Default is en)")
+  p.Println("5: Change SpecialOS, you can only choose between NixOS and none")
   editconf := true
   for editconf {
-    fmt.Println("Type the Number of the Config you want to change or type 'done' if everything is set correctly")
+    p.Println("Type the Number of the Config you want to change or type 'done' if everything is set correctly")
     var confuserinput string
     switch fmt.Scanln(&confuserinput); confuserinput {
     case "done":
       editconf = false
     case "1":
       if config.generate_desktop_file == true {
-        fmt.Println("Changed now Generate Desktop file to False")
+        p.Println("Changed now Generate Desktop file to False")
         config.generate_desktop_file = false
       } else {
-        fmt.Println("Changed now Generate Desktop file to True")
+        p.Println("Changed now Systemwide Desktop file to True")
         config.generate_desktop_file = true
       }
     case "2":
       if config.systemwide_desktop_entry == true {
-        fmt.Println("Changed now Generate Desktop file to False")
+        p.Println("Changed now Systemwide Desktop file to False")
         config.systemwide_desktop_entry = false
       } else {
-        fmt.Println("Changed now Generate Desktop file to True")
+        p.Println("Changed now Generate Desktop file to True")
         config.systemwide_desktop_entry = true
       }
     case "3":
-      fmt.Println("Please type the Directory where the WebApps should be created")
+      p.Println("Please type the Directory where the WebApps should be created")
       var directory string
       fmt.Scanln(&directory)
+      if strings.HasPrefix(directory, "~/") {
+        User, err := user.Current()
+        if err != nil {
+          fmt.Println(err)
+          os.Exit(1)
+        }
+        strings.Replace(directory, "~", "/home/" + User.Username + "/", 1)
+      }
       config.webapps_directory = directory
-      fmt.Println("Changed to " + directory)
+      p.Println("Changed to " + directory)
     case "4":
-      fmt.Println("Type your wanted locale You can choose: 'de', 'en'")
+      p.Println("Type your wanted locale You can choose: 'de', 'en'")
       var locale string
       fmt.Scanln(&locale)
       config.locale = locale
-      fmt.Println("Changed to " + locale)
+      p.Println("Changed to " + locale)
     case "5":
-      fmt.Println("Type your wanted SpecialOS You can choose: 'NixOS', 'none'")
+      p.Println("Type your wanted SpecialOS You can choose: 'NixOS', 'none'")
       var SpecialOS string
       fmt.Scanln(&SpecialOS)
       SpecialOS = strings.ToLower(SpecialOS)
@@ -88,11 +101,10 @@ func writeConfig(config *configstruct, configfile *viper.Viper) {
       } else {
         config.specialos = "none"
       }
-      fmt.Println("Changed to " + SpecialOS)
+      p.Println("Changed to " + SpecialOS)
     }
   }
-
-  configfile.Set("general.first_launch", config.first_launch)
+  configfile.Set("general.first_launch", false)
   configfile.Set("general.generate_desktop_file", config.generate_desktop_file)
   configfile.Set("general.systemwide_desktop_entry", config.systemwide_desktop_entry)
   configfile.Set("general.webapps_directory", config.webapps_directory)
