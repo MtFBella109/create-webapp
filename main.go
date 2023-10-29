@@ -1,22 +1,19 @@
 package main
 
-//go:generate gotext -srclang=en update -out=catalog/catalog.go -lang=en,de
 
 import (
   "fmt"
   "io"
+  "bufio"
   "os"
   "os/exec"
   "path/filepath"
   "strings"
   "syscall"
-  "golang.org/x/text/language"
-  "golang.org/x/text/message"
 )
 
 
-func createWebApp(config *configstruct, webappName, webappURL string, P *message.Printer) {
-  cwd, _ := syscall.Getwd()
+func createWebApp(config *configstruct, webappName, webappURL, cwd string) {
   err := syscall.Chdir(config.webapps_directory)
   errCheck(err)
 
@@ -75,9 +72,9 @@ func createWebApp(config *configstruct, webappName, webappURL string, P *message
       errCheck(err)
     }
 
-    P.Println("WebApp was successfully created")
+    fmt.Println("WebApp was successfully created")
   } else if config.generate_desktop_file && config.specialos == "nixos" {
-    P.Println("Function to add NixOS support is not yet implemented")
+    fmt.Println("Function to add NixOS support is not yet implemented")
   }
   defer syscall.Chdir(cwd)
 }
@@ -90,17 +87,56 @@ func errCheck(err error) {
 }
 
 func main() {
-  config := Config()
 
   var webappName string
   var webappURL string
+  cwd, _ := syscall.Getwd()
 
-  P := message.NewPrinter(language.German)
+  var M = map[string]func(...interface{}) (n int, err error){
+      "en": fmt.Println,
+      "de": func(args ...interface{}) (n int, err error) {
+          translatedArgs := Translate("de", cwd, args)
+          return fmt.Println(translatedArgs...)
+      },
+  }
+  config := Config(M)
 
-  P.Println("What's the Name of the WebApp?")
+
+  M[config.locale]("What's the Name of the WebApp?")
   fmt.Scanln(&webappName)
-  P.Println("What's the URL of the WebApp?")
+  fmt.Println(config.locale)
+  M[config.locale]("What's the URL of the WebApp?")
   fmt.Scanln(&webappURL)
 
-  createWebApp(config, webappName, webappURL, P)
+  createWebApp(config, webappName, webappURL, cwd)
 }
+
+func Translate(locale, cwd string, args []interface{}) []interface{} {
+  localefilePath := filepath.Join(cwd, "locales", locale+".po")
+
+  localefile, err := os.Open(localefilePath)
+  if err != nil {
+    // print if there is any error
+    fmt.Println("Error opening file: ", localefilePath, err)
+    return args
+  }
+  defer localefile.Close()
+
+  scanner := bufio.NewScanner(localefile)
+  var previousLine, currentLine, nextLine string
+  for scanner.Scan() {
+    previousLine = currentLine
+    currentLine = nextLine
+    nextLine = scanner.Text()
+
+    if currentLine == args[0].(string) {
+      return []interface{}{nextLine}
+    }
+    if currentLine == previousLine && currentLine == nextLine {
+      break
+    }
+  }
+  return args
+}
+
+

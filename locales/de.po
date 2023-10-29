@@ -1,0 +1,8 @@
+What's the URL of the WebApp?
+Was ist die URL der WebApp?
+
+What's the Name of the WebApp?
+Was ist der Name der WebApp?
+
+1: Generate Desktop File (Default is true)
+1: Generiere Desktop Datei (Standardmäßig aktiviert)
