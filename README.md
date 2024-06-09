@@ -1,5 +1,7 @@
 # create-webapp
 
+# The Project is no longer in development, maybe I will continue on this Project one day, bit I don't think so
+
 
 ## State of create-webapp
 Right now it's considered as a Alpha, I rewrote the complete Code in a other Programming Language,  one Feature is only left to re-implement. 
